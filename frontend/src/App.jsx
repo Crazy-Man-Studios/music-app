@@ -20,6 +20,19 @@ function api(path, options = {}, token = null) {
   return fetch(`${API_BASE}${path}`, { ...options, headers });
 }
 
+
+async function parseJsonSafe(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return null;
+  }
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
   const [activeView, setActiveView] = useState('discover');
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -34,8 +47,8 @@ export default function App() {
 
   async function refreshPublications() {
     const response = await api('/publications', {}, token);
-    const data = await response.json();
-    setPublications(data);
+    const data = await parseJsonSafe(response);
+    setPublications(Array.isArray(data) ? data : []);
   }
 
   async function refreshPlaylists() {
@@ -61,16 +74,19 @@ export default function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.detail || 'Authentication failed');
+    const data = await parseJsonSafe(response);
+    if (!response.ok || !data) {
+      setMessage(data?.detail || 'Authentication failed');
       return;
     }
     setToken(data.access_token);
     setUser(data.user);
     localStorage.setItem('token', data.access_token);
     localStorage.setItem('user', JSON.stringify(data.user));
+    setActiveView('discover');
     setMessage(`Welcome ${data.user.username}`);
+    refreshPublications();
+    refreshPlaylists();
   }
 
   function onLogout() {
@@ -101,8 +117,8 @@ export default function App() {
       body: formData,
     }, token);
     if (!response.ok) {
-      const err = await response.json();
-      setMessage(err.detail || 'Upload failed');
+      const err = await parseJsonSafe(response);
+      setMessage(err?.detail || 'Upload failed');
       return;
     }
     setMessage('Upload submitted for review');
