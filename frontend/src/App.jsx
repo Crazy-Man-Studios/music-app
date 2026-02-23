@@ -33,6 +33,19 @@ async function parseJsonSafe(response) {
   }
 }
 
+function extractErrorMessage(data, fallback) {
+  if (!data) return fallback;
+  if (typeof data.detail === 'string') return data.detail;
+  if (Array.isArray(data.detail)) {
+    const first = data.detail[0];
+    if (first?.msg) {
+      const location = Array.isArray(first.loc) ? first.loc.join('.') : 'field';
+      return `${location}: ${first.msg}`;
+    }
+  }
+  return fallback;
+}
+
 export default function App() {
   const [activeView, setActiveView] = useState('discover');
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -76,7 +89,7 @@ export default function App() {
     });
     const data = await parseJsonSafe(response);
     if (!response.ok || !data) {
-      setMessage(data?.detail || 'Authentication failed');
+      setMessage(extractErrorMessage(data, 'Authentication failed'));
       return;
     }
     setToken(data.access_token);
@@ -118,7 +131,7 @@ export default function App() {
     }, token);
     if (!response.ok) {
       const err = await parseJsonSafe(response);
-      setMessage(err?.detail || 'Upload failed');
+      setMessage(extractErrorMessage(err, 'Upload failed'));
       return;
     }
     setMessage('Upload submitted for review');
