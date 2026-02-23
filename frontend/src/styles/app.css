@@ -1,0 +1,96 @@
+:root {
+  font-family: Inter, Arial, sans-serif;
+  color: #f8fafc;
+  background: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: #111827;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px;
+  color: white;
+  background: #1f2937;
+  text-align: left;
+}
+
+.sidebar button.active {
+  background: #2563eb;
+}
+
+.content {
+  padding: 24px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #334155;
+}
+
+button {
+  cursor: pointer;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+  max-width: 550px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 12px;
+  background: #1e293b;
+}
+
+.message {
+  background: #065f46;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.account-pill {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
